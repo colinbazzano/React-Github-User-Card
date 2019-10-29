@@ -1,34 +1,53 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './App.css';
 import axios from 'axios';
 
+// local imports below
+import UserCard from './components/UserCard';
+
 class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      users: [],
-      userNames: ""
-    };
-  }
+  state = {
+    user: {},
+    followers: []
+  };
   componentDidMount() {
     axios.get('https://api.github.com/users/colinbazzano')
+      .then(response => {
+        this.setState({
+           user: response.data });
+      })
+      .catch(error => console.error(error));
+  }
+
+  fetchFollowers = () => {
+    axios.get('https://api.github.com/users/colinbazzano/followers')
     .then(response => {
       this.setState({
-        users: response.data
+        followers: response.data
       });
-      console.log(response);
     })
-    .catch(error => console.log('Oh no!', error));
+    .catch(error => console.log('Not here!', error))
   }
+    // axios.get(this.state.user.followers_url)
+    // .then(response => this.setState({ followers: response.data.followers_url }))
+    // .catch(error => console.log('Oh no!', error));
+
+  // fetchFollowers = () => {
+  //   axios.get(`https://api.github.com/users/colinbazzano/followers`)
+  //   .then(response => {
+  //     this.setState({
+  //       user: response.data
+  //     });
+  //   })
+  //   .catch(error => console.log(error));
+  // }
 
   render() {
     return (
       <div className="App">
         <h1>Github User Cards!</h1>
-        <div className="myself">
-          {this.state.users}
-        </div>
+        <button onClick={this.fetchFollowers}> Check out my Followers!</button>
+        <UserCard user={this.state.user} followers={this.state.followers} />
       </div>
     );
   }
